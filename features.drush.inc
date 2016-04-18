@@ -245,6 +245,9 @@ function drush_features_list() {
       );
     }
   }
+  if (version_compare(DRUSH_VERSION, '6.0', '<')) {
+    drush_print_table($rows, TRUE);
+  }
   return $rows;
 }
 
