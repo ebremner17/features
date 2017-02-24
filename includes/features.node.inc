@@ -127,13 +127,15 @@ function node_features_revert($module = NULL) {
  */
 function node_features_disable_feature($module) {
   if ($default_types = features_get_default('node', $module)) {
+    // Let the site define a variable that decides whether or not content types also get disabled when the feature is disabled.
+    $disable_content_types = variable_get('features_disable_content_types', 0);
     foreach ($default_types as $type_name => $type_info) {
       $type_info = node_type_load($type_name);
       $type_info->module = 'node';
       $type_info->custom = 1;
       $type_info->modified = 1;
       $type_info->locked = 0;
-      $type_info->disabled = 0;
+      $type_info->disabled = $disable_content_types;
       node_type_save($type_info);
     }
   }
