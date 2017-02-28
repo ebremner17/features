@@ -155,6 +155,7 @@ function node_features_disable_feature($module) {
 function node_features_enable_feature($module) {
   if ($default_types = features_get_default('node', $module)) {
     $rebuild = FALSE;
+    $disable_content_types = variable_get('features_disable_content_types', 0);
     foreach ($default_types as $type_name => $type_info) {
       // Ensure the type exists.
       if ($type_info = node_type_load($type_name)) {
@@ -166,6 +167,18 @@ function node_features_enable_feature($module) {
         node_type_save($type_info);
       }
       else {
+        // If we were disabling content types, reenable them so the rebuild works properly.
+        if ($disable_content_types) {
+          db_update('node_type')
+            ->fields(array(
+              'module' => $module,
+              'custom' => 0,
+              'modified' => 0,
+              'disabled' => 0,
+            ))
+            ->condition('type', $type_name, '=')
+            ->execute();
+        }
         $rebuild = TRUE;
       }
     }
